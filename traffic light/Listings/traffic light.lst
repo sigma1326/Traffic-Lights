@@ -1,0 +1,193 @@
+A51 MACRO ASSEMBLER  TRAFFIC_LIGHT                                                        12/16/2016 17:37:09 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\traffic light.obj
+ASSEMBLER INVOKED BY: D:\Keil_v5\C51\BIN\A51.EXE traffic light.asm SET(SMALL) DEBUG PRINT(.\Listings\traffic light.lst) 
+                      OBJECT(.\Objects\traffic light.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG   00h
+                       2             ;defining time slots
+  0063                 3             red equ 99
+  005A                 4             green equ 90
+  0009                 5             yellow equ 9
+                       6             
+                       7             ;r3 : light change counter
+                       8             
+                       9             ;r4 : traffic light1 counter
+                      10             ;r5 : traffic light2 counter
+                      11             ;r6 : traffic light3 counter
+                      12             
+                      13             
+0000                  14             MAIN_LOOP:
+                      15             ;;;;;;;;;;;;;;;;;;;;; state 1
+0000 7C5A             16             mov r4,#green
+0002 7D63             17             mov r5,#red
+0004 7E63             18             mov r6,#red
+                      19             ;G:1 - Y: - R:2,3
+0006 C290             20             clr p1.0  ;setting decoder for traffic light 1
+0008 D291             21             setb p1.1 ;setting decoder for traffic light 1
+000A C292             22             clr p1.2  ;setting decoder for traffic light 2
+000C C293             23             clr p1.3  ;setting decoder for traffic light 2
+000E C294             24             clr p1.4  ;setting decoder for traffic light 3
+0010 C295             25             clr p1.5  ;setting decoder for traffic light 3
+0012 7B5A             26             mov r3,#green
+0014 1200AC           27             lcall delay
+0017 7C09             28             mov r4,#yellow
+                      29             ;G: - Y:1 - R:2,3
+0019 D290             30             setb p1.0
+001B C291             31             clr p1.1
+001D C292             32             clr p1.2
+001F C293             33             clr p1.3
+0021 C294             34             clr p1.4
+0023 C295             35             clr p1.5
+0025 7B09             36             mov r3,#yellow
+0027 1200AC           37             lcall delay
+                      38             ;;;;;;;;;;;;;;;;;;;;; state 2
+002A 7C63             39             mov r4,#red
+002C 7D5A             40             mov r5,#green
+002E 7E63             41             mov r6,#red
+                      42             ;G:2 - Y: - R:1,3
+0030 C292             43             clr p1.2
+0032 D293             44             setb p1.3
+0034 C290             45             clr p1.0
+0036 C291             46             clr p1.1
+0038 C294             47             clr p1.4
+003A C295             48             clr p1.5
+003C 7B5A             49             mov r3,#green
+003E 1200AC           50             lcall delay
+0041 7D09             51             mov r5,#yellow
+                      52             ;G: - Y:2 - R:1,3
+0043 D292             53             setb p1.2
+0045 C293             54             clr p1.3
+0047 C290             55             clr p1.0
+0049 C291             56             clr p1.1
+004B C294             57             clr p1.4
+A51 MACRO ASSEMBLER  TRAFFIC_LIGHT                                                        12/16/2016 17:37:09 PAGE     2
+
+004D C295             58             clr p1.5
+004F 7B09             59             mov r3,#yellow
+0051 1200AC           60             lcall delay
+                      61             ;;;;;;;;;;;;;;;;;;;;; state 3
+0054 7C63             62             mov r4,#red
+0056 7D63             63             mov r5,#red
+0058 7E5A             64             mov r6,#green
+                      65             ;G:3 - Y: - R:2,1
+005A C294             66             clr p1.4
+005C D295             67             setb p1.5
+005E C290             68             clr p1.0
+0060 C291             69             clr p1.1
+0062 C292             70             clr p1.2
+0064 C293             71             clr p1.3
+0066 7B5A             72             mov r3,#green
+0068 1200AC           73             lcall delay
+006B 7E09             74             mov r6,#yellow
+                      75             ;G: - Y:3 - R:2,1
+006D D294             76             setb p1.4
+006F C295             77             clr p1.5
+0071 C290             78             clr p1.0
+0073 C291             79             clr p1.1
+0075 C292             80             clr p1.2
+0077 C293             81             clr p1.3
+0079 7B09             82             mov r3,#yellow
+007B 1200AC           83             lcall delay
+                      84             
+007E 020000           85             ljmp MAIN_LOOP
+                      86             
+                      87             ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                      88             
+                      89             
+                      90             ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; display the number in 7segment
+0081                  91             seg_display:
+                      92             ;divide the number in 2 parts for each 7segment
+0081 E4               93             clr a
+0082 EC               94             mov a,r4
+0083 75F00A           95             mov b,#10
+0086 84               96             div ab
+0087 23               97             rl a
+0088 23               98             rl a
+0089 23               99             rl a
+008A 23              100             rl a
+008B 25F0            101             add a,b
+008D F5B0            102             mov p3,a ;display the final result on 7segment for traffic light 1
+                     103             ;;;;;;;;;
+008F E4              104             clr a
+0090 ED              105             mov a,r5
+0091 75F00A          106             mov b,#10
+0094 84              107             div ab
+0095 23              108             rl a
+0096 23              109             rl a
+0097 23              110             rl a
+0098 23              111             rl a
+0099 25F0            112             add a,b
+009B F5A0            113             mov p2,a ;display the final result on 7segment for traffic light 2
+                     114             ;;;;;;;;;;
+009D E4              115             clr a
+009E EE              116             mov a,r6
+009F 75F00A          117             mov b,#10
+00A2 84              118             div ab
+00A3 23              119             rl a
+00A4 23              120             rl a
+00A5 23              121             rl a
+00A6 23              122             rl a
+00A7 25F0            123             add a,b
+A51 MACRO ASSEMBLER  TRAFFIC_LIGHT                                                        12/16/2016 17:37:09 PAGE     3
+
+00A9 F580            124             mov p0,a ;display the final result on 7segment for traffic light 3
+00AB 22              125             ret
+                     126             
+                     127             
+                     128             ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; making delay for time counting
+                     129             ;Delay
+00AC                 130             delay:
+00AC                 131             loop3:
+00AC 120081          132             lcall seg_display
+00AF 1B              133             dec r3
+00B0 1C              134             dec r4
+00B1 1D              135             dec r5
+00B2 1E              136             dec r6
+00B3 7A08            137             mov r2,#8
+00B5                 138             loop2:
+00B5 79FA            139             mov r1,#250
+00B7                 140             loop1:
+00B7 78FA            141             mov r0,#250
+00B9                 142             loop0:
+00B9 D8FE            143             djnz r0,loop0
+00BB D9FA            144             djnz r1,loop1
+00BD DAF6            145             djnz r2,loop2
+00BF BBFFEA          146             cjne r3,#-1,loop3
+00C2 22              147             ret
+                     148     
+                     149     END
+                             
+A51 MACRO ASSEMBLER  TRAFFIC_LIGHT                                                        12/16/2016 17:37:09 PAGE     4
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+B. . . . . . . . .  D ADDR   00F0H   A   
+DELAY. . . . . . .  C ADDR   00ACH   A   
+GREEN. . . . . . .  N NUMB   005AH   A   
+LOOP0. . . . . . .  C ADDR   00B9H   A   
+LOOP1. . . . . . .  C ADDR   00B7H   A   
+LOOP2. . . . . . .  C ADDR   00B5H   A   
+LOOP3. . . . . . .  C ADDR   00ACH   A   
+MAIN_LOOP. . . . .  C ADDR   0000H   A   
+P0 . . . . . . . .  D ADDR   0080H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+P3 . . . . . . . .  D ADDR   00B0H   A   
+RED. . . . . . . .  N NUMB   0063H   A   
+SEG_DISPLAY. . . .  C ADDR   0081H   A   
+YELLOW . . . . . .  N NUMB   0009H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)
